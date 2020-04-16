@@ -5,10 +5,7 @@ locals {
   common_tags = {
     "ApplicationName"   = var.application_name
     "Owner"             = var.owner_email
-    "BusinessUnit"      = var.business_unit
-    "CostCenter"        = var.costcenter_id
     "Environment"       = var.environment
-    "Customer"          = var.customer_name
   }
   resource_group_name = element(
     coalescelist(azurerm_resource_group.rg.*.name, [""]), 0)

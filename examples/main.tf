@@ -8,7 +8,7 @@ module "virtualnetwork" {
   create_network_watcher  = true
 
 # Using Custom names and VNet/subnet Address Prefix (Recommended)
-  resource_group_name     = "rg-demo-kumars-01"
+  resource_group_name     = "rg-demo-gandalf-01"
   vnetwork_name           = "vnet-demo-westeurope-001"
   location                = "northeurope"
   vnet_address_space      =  ["10.1.0.0/16"]
@@ -21,11 +21,8 @@ module "virtualnetwork" {
   create_firewall         = false
   firewall_subnet_address_prefix = "10.1.1.0/24"
 
-# Adding TAG's to your Azure resources (Required)
-  application_name        = "TestApp1"
-  owner_email             = "kumars@example.com"
-  business_unit           = "publiccloud"
-  costcenter_id           = "5847596"
-  environment             = "development"
-  customer_name           = "cloudascode"
+# Adding TAG's to your Azure resources. update the `variables.tf` as per your needs (Required)
+  application_name        = var.application_name
+  owner_email             = var.owner_email
+  environment             = var.environment
 }

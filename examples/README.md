@@ -49,15 +49,12 @@ To enable route to the internet from subnet via Azure Firewall, firewall has to 
 ## Adding TAG's to your Azure resources
 Use tags to organize your Azure resources and management hierarchy. You apply tags to your Azure resources, resource groups, and subscriptions to logically organize them into a taxonomy. Each tag consists of a name and a value pair. For example, you can apply the name "Environment" and the value "Production" to all the resources in production. This is expected and must provide the following details as per your environment. There are no default values available for these arguments.
 
-Here I have added the values directly. However, if you want, you can manage these as variables under `variables.tf` as well.  
+Here the values as an variables. However, if you want, you can input these values directly as well.  
 
 ```
-  application_name      = "TestApp1"
-  owner_email           = "kumars@example.com"
-  business_unit         = "publiccloud"
-  costcenter_id         = "5847596"
-  environment           = "development"
-  customer_name         = "cloudascode"
+  application_name        = var.application_name
+  owner_email             = var.owner_email
+  environment             = var.environment
 
 ```
 ## Terraform Usage

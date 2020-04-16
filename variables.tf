@@ -81,19 +81,8 @@ variable "owner_email" {
     description = "Please provide owner email for this environment"
 }
 
-variable "business_unit" {
-    description = "Please provide Business Unit details here"
-}
-
 variable "environment" {
     description = "Please provide your application environment details here"
 }
 
-variable "customer_name" {
-    description = "Please provide project name here"
-}
 
-variable "costcenter_id" {
-    description = "Plesae provide cost center Id here"
-  
-}

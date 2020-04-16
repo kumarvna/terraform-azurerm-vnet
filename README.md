@@ -121,7 +121,7 @@ firewall_subnet_ids|List of IDs of firewall subnets
 
 ## Authors
 
-Module is maintained by [Kumaraswamy Vithanala](mailto:kumaraswamy.vithanala@tieto.com) with the help from other awesome contributors.
+Module is maintained by [Kumaraswamy Vithanala](mailto:kumarvna@gmail.com) with the help from other awesome contributors.
 
 ## Other resources
 
