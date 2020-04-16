@@ -77,7 +77,7 @@ By default, this enabled. You can exclude this from the Terraform plan using `cr
 
 
 ## Firewall
-This module manages the provision of the basic firewall. However, if you want to add rules, you have to include additional resources to attach needed custom/NAT/Application rules. 
+This module manages the provision of the firewall. However, if you want to add rules, you have to include additional resources to attach needed custom/NAT/Application rules. 
 
 To enable route to the internet from subnet via Azure Firewall, firewall has to be created first (`create_firewall = true`), then set `public_internet_route_next_hop_type = "VirtualAppliance"` and `public_internet_route_next_hop_in_ip_address = "AzureFirewall"` to the `azurerm_route_table` or `azurerm_route` resources. 
 
