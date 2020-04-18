@@ -25,12 +25,11 @@ provider "azurerm" {
   }
 
 module "virtualnetwork" {
-  source                  = "../../"
-  create_resource_group   = true
+  source                  = "../"
   create_network_watcher  = true
 
 # Using Custom names and VNet/subnet Address Prefix (Recommended)
-  resource_group_name     = "rg-demo-kumars-01"
+  resource_group_name     = "rg-MyResourceGroup"
   vnetwork_name           = "vnet-demo-westeurope-001"
   location                = "northeurope"
   vnet_address_space      =  ["10.1.0.0/16"]
@@ -45,7 +44,7 @@ module "virtualnetwork" {
 
 # Adding TAG's to your Azure resources (Required)
   application_name        = "TestApp1"
-  owner_email             = "kumars@example.com"
+  owner_email             = "user@example.com"
   business_unit           = "publiccloud"
   costcenter_id           = "5847596"
   environment             = "development"
@@ -55,7 +54,7 @@ module "virtualnetwork" {
 
 ## Create resource group
 
-By default, this module will create a resource group and the name of the resource group to be given in an argument `resource_group_name` for custom naming conventions. If you want to create it using this module, set argument `create_resource_group = true`
+By default, this module will create a resource group and the name of the resource group to be given in an argument `resource_group_name` for custom naming conventions.
 
 ## AzureNetwork DDoS Protection Plan
 

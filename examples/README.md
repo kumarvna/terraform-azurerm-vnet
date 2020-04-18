@@ -11,7 +11,7 @@ Add AzureRM provider to start with the module configuration. Whilst the `version
 This is optional. However, we recommend you to check with the network or cloud teams and give suitable CIDR block to configure these values. Provide proper values to following arguments to use your custom names and address prefix. 
 
 ```
-  resource_group_name   = "rg-demo-kumars-01"
+  resource_group_name   = "rg-MyResourceGroup"
   vnetwork_name         = "vnet-demo-westeurope-001"
   location              = "northeurope"
   vnet_address_space    =  ["10.1.0.0/16"]

@@ -4,11 +4,10 @@ provider "azurerm" {
 
 module "virtualnetwork" {
   source                  = "../"
-  create_resource_group   = true
   create_network_watcher  = true
 
 # Using Custom names and VNet/subnet Address Prefix (Recommended)
-  resource_group_name     = "rg-demo-gandalf-01"
+  resource_group_name     = "rg-MyResourceGroup"
   vnetwork_name           = "vnet-demo-westeurope-001"
   location                = "northeurope"
   vnet_address_space      =  ["10.1.0.0/16"]
