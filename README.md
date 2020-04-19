@@ -45,10 +45,7 @@ module "virtualnetwork" {
 # Adding TAG's to your Azure resources (Required)
   application_name        = "TestApp1"
   owner_email             = "user@example.com"
-  business_unit           = "publiccloud"
-  costcenter_id           = "5847596"
   environment             = "development"
-  customer_name           = "cloudascode"
 }
 ```
 
