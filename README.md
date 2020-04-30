@@ -22,7 +22,7 @@ Following example to create a virtual network with subnets and network watcher r
 
 ```
 module "virtualnetwork" {
-  source                  = "github.com/kumarvna/terraform-azurerm-vnet?ref=v1.2.0"
+  source                  = "github.com/kumarvna/terraform-azurerm-vnet?ref=v1.2.1"
   create_resource_group   = false
 
 # Using Custom names and VNet/subnet Address Prefix (Recommended)
