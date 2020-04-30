@@ -22,7 +22,7 @@ Following example to create a virtual network with subnets and network watcher r
 
 ```
 module "virtualnetwork" {
-  source                  = "github.com/tietoevry-infra-as-code/terraform-azurerm-vnet?ref=v1.0.0"
+  source                  = "github.com/kumarvna/terraform-azurerm-vnet?ref=v1.2.0"
   create_resource_group   = false
 
 # Using Custom names and VNet/subnet Address Prefix (Recommended)
@@ -102,7 +102,7 @@ Name | Description
 
 ## Authors
 
-Module is maintained by [Kumaraswamy Vithanala](mailto:kumaraswamy.vithanala@tieto.com) with the help from other awesome contributors.
+Module is maintained by [Kumaraswamy Vithanala](mailto:kumarvna@gmail.com) with the help from other awesome contributors.
 
 ## Other resources
 
