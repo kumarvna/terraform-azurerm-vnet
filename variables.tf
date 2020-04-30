@@ -5,7 +5,7 @@ variable "create_network" {
 
 variable "create_resource_group" {
     description = "Whether to create resource group and use it for all networking resources"
-    default     = true
+    default     = false
 }
 
 variable "create_network_watcher" {
@@ -15,11 +15,6 @@ variable "create_network_watcher" {
 
 variable "create_ddos_plan" {
     description = "Create an ddos plan - Default is false"
-    default     = false
-}
-
-variable "create_firewall" {
-    description = "Whether to create firewall (incl. subnet and public IP))"
     default     = false
 }
 
@@ -35,7 +30,7 @@ variable "ddos_plan_name" {
 
 variable "resource_group_name" {
     description = "A container that holds related resources for an Azure solution"
-    default     = "rg-MyResourceGroup"
+    default     = "rg-demo-westeurope-01"
 }
 
 variable "location" {
@@ -50,40 +45,26 @@ variable "vnetwork_name" {
 
 variable "vnet_address_space" {
     description = "The address space to be used for the Azure virtual network."
-    default = ["10.0.0.0/16"]
+    default     = ["10.0.0.0/16"]
 }
 
 variable "private_subnets" {
     description = "A list the subnet names using a comma"
-    default = ["snet_gw01","snet_app01","snet_app02"]
+    default     = ["snet_gw01","snet_app01"]
 }
 
 variable "subnet_address_prefix" {
     description ="A list of Subnet Prefixes to use along with subnet names"
-    default = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"] 
-}
-
-variable "firewall_subnet_address_prefix" {
-    description = "Address prefix to use on firewall subnet. Default is a valid value, which should be overriden."
-    default     = "0.0.0.0/0"
+    default     = ["10.0.1.0/24", "10.0.2.0/24"] 
 }
 
 variable "netwatcher_name" {
     description = "The name of the Network Watcher"
-    default = "netwatcher01"
+    default     = "netwatcher01"
 }
 
-variable "application_name" {
-    description = "Please provide your application name"
-    default     = ""
-}
-
-variable "owner_email" {
-    description = "Please provide owner email for this environment"
-    default     = ""
-}
-
-variable "environment" {
-    description = "Please provide your application environment details here"
-    default     = ""
+variable "tags" {
+    description = "A map of tags to add to all resources"
+    type        =  map(string)
+    default     = {}
 }

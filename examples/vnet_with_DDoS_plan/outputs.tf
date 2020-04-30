@@ -1,57 +1,53 @@
 # Resource Group
 output "resource_group_name" {
   description = "The name of the resource group in which resources are created"  
-  value = element(
-    coalescelist(azurerm_resource_group.rg.*.name, [""],), 0,)
+  value = module.virtualnetwork.resource_group_name
 }
 
 output "resource_group_id" {
   description = "The id of the resource group in which resources are created"  
-  value = element(
-    coalescelist(azurerm_resource_group.rg.*.id, [""],), 0,)
+  value = module.virtualnetwork.resource_group_id
 }
 
 output "resource_group_location" {
   description = "The location of the resource group in which resources are created"  
-  value = element(
-    coalescelist(azurerm_resource_group.rg.*.location, [""],), 0,)
+  value = module.virtualnetwork.resource_group_location
 }
 
-# Vnet and Subnets
-
+#VNet and Subnets 
 output "virtual_network_name" {
   description = "The name of the virtual network"  
-  value = element(concat(azurerm_virtual_network.vnet.*.name, [""]), 0)
+  value = module.virtualnetwork.virtual_network_name
 }
 
 output "virtual_network_id" {
   description = "The id of the virtual network"  
-  value = element(concat(azurerm_virtual_network.vnet.*.id, [""]), 0)
+  value = module.virtualnetwork.virtual_network_id
 }
 
 output "virtual_network_address_space" {
   description = "List of address spaces that are used the virtual network."
-  value = element(coalescelist(azurerm_virtual_network.vnet.*.address_space, [""]), 0)
+  value = module.virtualnetwork.virtual_network_address_space
 }
 
 output "subnet_ids" {
   description = "List of IDs of subnets"  
-  value = azurerm_subnet.snets.*.id
+  value = module.virtualnetwork.subnet_ids
 }
 
 output "subnet_address_prefixes" {
   description = "List of address prefix for subnets"  
-  value = azurerm_subnet.snets.*.address_prefix
+  value = module.virtualnetwork.subnet_address_prefixes
 }
 
-# DDoS Protection Plan
+# DDoS Protection plan
 output "ddos_protection_plan" {
   description = "Ddos protection plan details"
-  value       = element(concat(azurerm_network_ddos_protection_plan.ddos.*.id, [""]), 0)
+  value       = module.virtualnetwork.ddos_protection_plan
 }
 
 # Network Watcher
 output "network_watcher_id" {
   description = "ID of Network Watcher"
-  value = element(concat(azurerm_network_watcher.nwatcher.*.id, [""]), 0)
+  value = module.virtualnetwork.network_watcher_id
 }
