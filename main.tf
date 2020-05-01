@@ -16,7 +16,7 @@ locals {
 
 data "azurerm_resource_group" "rgrp" {
   count = var.create_resource_group ? 0 : 1
-  name = "${var.resource_group_name}"
+  name = var.resource_group_name
 }
 
 resource "azurerm_resource_group" "rg" {
