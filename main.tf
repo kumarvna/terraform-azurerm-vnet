@@ -15,7 +15,7 @@ locals {
 }
 
 data "azurerm_resource_group" "rgrp" {
-  count = var.create_resource_group == tobool(false) ? 1 : 0
+  count = var.create_resource_group ? 0 : 1
   name = "${var.resource_group_name}"
 }
 
