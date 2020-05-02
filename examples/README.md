@@ -46,11 +46,11 @@ This is an optional and only applicable if you are using different DNS servers i
 
 By default, this not enabled. Only IPs expected here. If you have multiple DNS servers, then values to the argument `dns_servers = ["4.4.4.4","8.8.8.8"]`
 
-## Adding TAG's to your Azure resources
+## Tagging
 
 Use tags to organize your Azure resources and management hierarchy. You can apply tags to your Azure resources, resource groups, and subscriptions to logically organize them into a taxonomy. Each tag consists of a name and a value pair. For example, you can apply the name "Environment" and the value "Production" to all the resources in production. You can manage these values variables directly or mapping as a variable using `variables.tf`.
 
-All network resources which support tagging can be tagged by specifying key-values in argument `tags`. Tag Name is added automatically on all resources. For example, you can specify `tags` like this as per environment:
+All Azure resources which support tagging can be tagged by specifying key-values in argument `tags`. Tag Name is added automatically on all resources. For example, you can specify `tags` like this:
 
 ```
 module "vnet" {
