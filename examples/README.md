@@ -1,7 +1,5 @@
 # Virtual Network resource creation example
 
-[![Terraform](https://img.shields.io/badge/Terraform%20-0.12-brightgreen.svg?style=flat)](https://github.com/hashicorp/terraform/releases) [![License](https://img.shields.io/badge/License%20-MIT-brightgreen.svg?style=flat)](https://github.com/kumarvna/cloudascode/blob/master/LICENSE)
-
 Configuration in this directory creates a set of Azure network resources. Few of these resources added/excluded as per your requirement.
 
 ## Create resource group
@@ -9,24 +7,6 @@ Configuration in this directory creates a set of Azure network resources. Few of
 By default, this module will not create a resource group and the name of an existing resource group to be given in an argument `create_resource_group`. If you want to create a new resource group, set the argument `create_resource_group = true`.
 
 *If you are using an existing resource group, then this module uses the same resource group location to create all resources in this module.*
-
-## Using Custom names and VNet/subnet Address Prefix
-
-This is optional. However, we recommend you to check with the network or cloud teams and give suitable CIDR block to configure these values. Provide proper values to following arguments to use your custom names and address prefix.
-
-```
-  resource_group_name   = "rg-demo-westeurope-01"
-  vnetwork_name         = "vnet-demo-westeurope-001"
-  location              = "westeurope"
-  vnet_address_space    =  ["10.1.0.0/16"]
-  private_subnets       = ["snet-app01","snet-app02","snet-gw01"]
-  subnet_address_prefix = ["10.1.1.0/24","10.1.2.0/24","10.1.3.0/24"]
-
-```
-
-If you haven't provided with any values for the above arguments, then default values to apply to create the required resources. You can create as many subnets as you can!
-
-To get the list of all locations with table format from CLI, run this command `"az account list-locations -o table"`
 
 ## Adding Network Watcher to your Subscription
 
@@ -55,7 +35,8 @@ All Azure resources which support tagging can be tagged by specifying key-values
 ```
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
-  version = "1.2.0"
+  version = "1.3.0"
+  create_resource_group   = false
 
   # ... omitted
 
@@ -75,16 +56,28 @@ Following example to create a virtual network with subnets and network watcher r
 
 ```
 module "vnet" {
-  source                  = "kumarvna/vnet/azurerm"
-  version                 = "1.2.0"
-    
-  # Resource Group
-  create_resource_group   = false
+  source  = "kumarvna/vnet/azurerm"
+  version = "1.3.0"
 
   # Using Custom names and VNet/subnet Address Prefix (Recommended)
-  resource_group_name     = "rg-demo-westeurope-01"
-  vnetwork_name           = "vnet-demo-westeurope-001"
-  location                = "westeurope"
+  create_resource_group = true
+  resource_group_name   = "rg-demo-westeurope-01"
+  vnetwork_name         = "vnet-demo-westeurope-001"
+  location              = "westeurope"
+  vnet_address_space    = ["10.1.0.0/16"]
+
+  # Multiple Subnets, Service delegation, Service Endpoints 
+  subnets = {
+    gw_subnet = {
+      subnet_name           = "snet-gw01"
+      subnet_address_prefix = "10.1.2.0/24"
+    }
+
+    app_subnet = {
+      subnet_name           = "snet-app01"
+      subnet_address_prefix = "10.1.3.0/24"
+    }
+  }
 
   # Adding TAG's to your Azure resources (Required)
   tags = {
@@ -97,28 +90,58 @@ module "vnet" {
 
 ## VNet with all additional features
 
-Following example to create a virtual network with subnets, DDoS protection plan, and network watcher resources.
+Following example to create a virtual network with subnets, NSG, DDoS protection plan, and network watcher resources.
+
 
 ```
 module "vnet" {
-  source                  = "kumarvna/vnet/azurerm"
-  version                 = "1.2.0"
-  
-  # Resource Group
-  create_resource_group   = false
+  source  = "kumarvna/vnet/azurerm"
+  version = "1.3.0"
 
   # Using Custom names and VNet/subnet Address Prefix (Recommended)
-  resource_group_name     = "rg-demo-westeurope-01"
-  vnetwork_name           = "vnet-demo-westeurope-001"
-  location                = "westeurope"
-  vnet_address_space      = ["10.1.0.0/16"]
-  private_subnets         = ["snet-app01","snet-app01"]
-  subnet_address_prefix   = ["10.1.2.0/24","10.1.3.0/24"]
+  create_resource_group = true
+  resource_group_name   = "rg-demo-westeurope-01"
+  vnetwork_name         = "vnet-demo-westeurope-001"
+  location              = "westeurope"
+  vnet_address_space    = ["10.1.0.0/16"]
 
-  # Adding Network watcher, Firewall and custom DNS servers (Optional)
-  create_ddos_plan        = false
-  dns_servers             = []
+  # Adding Network watcher, and custom DNS servers (Optional)
+  create_ddos_plan = false
+  dns_servers      = ["8.8.8.8", "4.4.4.4"]
 
+  # Multiple Subnets, Service delegation, Service Endpoints, Network security groups
+  subnets = {
+    gw_subnet = {
+      subnet_name           = "snet-gw01"
+      subnet_address_prefix = "10.1.2.0/24"
+      delegation = {
+        name = "demodelegationcg"
+        service_delegation = {
+          name    = "Microsoft.ContainerInstance/containerGroups"
+          actions = ["Microsoft.Network/virtualNetworks/subnets/join/action", "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action"]
+        }
+      }
+      nsg_inbound_rule = [
+        # [name, priority, destination_port_range, source_address_prefix]"
+        ["weballow", "100", "80", "*"],
+        ["weballow1", "101", "443", "*"],
+        ["weballow2", "102", "8080-8090", "*"],
+      ]
+    }
+
+    app_subnet = {
+      subnet_name           = "snet-app01"
+      subnet_address_prefix = "10.1.3.0/24"
+      service_endpoints     = ["Microsoft.Storage"]
+
+      nsg_inbound_rule = [
+        # [name, priority, destination_port_range, source_address_prefix]"
+        ["weballow", "100", "80", "*"],
+        ["weballow1", "101", "443", "AzureLoadBalancer"],
+        ["weballow2", "102", "9090", "VirtualNetwork"],
+      ]
+    }
+  }
   # Adding TAG's to your Azure resources (Required)
   tags = {
     Terraform   = "true"
@@ -152,5 +175,7 @@ Name | Description
 `virtual_network_address_space` | List of address spaces that are used the virtual network.
 `subnet_ids` | List of IDs of subnets
 `subnet_address_prefixes` | List of address prefix for  subnets
+`network_security_group_ids`|List of Network security groups and ids
+`network_security_group`|Network security group details - Useful for splat expression.
 `ddos_protection_plan` | Azure Network DDoS protection plan
 `network_watcher_id` | ID of Network Watcher
