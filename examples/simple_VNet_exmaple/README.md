@@ -18,7 +18,7 @@ module "vnet" {
   location              = "westeurope"
   vnet_address_space    = ["10.1.0.0/16"]
 
-  # Multiple Subnets, Service delegation, Service Endpoints, and NSG
+  # Multiple Subnets, Service delegation, Service Endpoints, Network security groups
   subnets = {
     gw_subnet = {
       subnet_name           = "snet-gw01"

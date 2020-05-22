@@ -23,15 +23,15 @@ module "vnet" {
   version = "1.3.0"
 
   # Using Custom names and VNet/subnet Address Prefix (Recommended)
-  create_resource_group = true
+  create_resource_group = false
   resource_group_name   = "rg-demo-westeurope-01"
   vnetwork_name         = "vnet-demo-westeurope-001"
   location              = "westeurope"
   vnet_address_space    = ["10.1.0.0/16"]
 
-  # Adding Network watcher, and custom DNS servers (Optional)
-  create_ddos_plan = false
-  dns_servers      = ["8.8.8.8", "4.4.4.4"]
+  # Adding Standard DDoS Plan, and custom DNS servers (Optional)
+  create_ddos_plan = true
+  dns_servers      = []
 
   # Multiple Subnets, Service delegation, Service Endpoints, Network security groups
   subnets = {
@@ -46,10 +46,10 @@ module "vnet" {
         }
       }
       nsg_inbound_rule = [
-        # [name, priority, destination_port_range, source_address_prefix]"
-        ["weballow", "100", "80", "*"],
-        ["weballow1", "101", "443", "*"],
-        ["weballow2", "102", "8080-8090", "*"],
+        # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix]"
+        ["weballow", "100", "Inbound", "Allow", "Tcp", "80", "*"],
+        ["weballow1", "101", "Inbound", "Allow", "Tcp", "443", "*"],
+        ["weballow2", "102", "Inbound", "Allow", "Tcp", "8080-8090", "*"],
       ]
     }
 
@@ -59,13 +59,14 @@ module "vnet" {
       service_endpoints     = ["Microsoft.Storage"]
 
       nsg_inbound_rule = [
-        # [name, priority, destination_port_range, source_address_prefix]"
-        ["weballow", "100", "80", "*"],
-        ["weballow1", "101", "443", "AzureLoadBalancer"],
-        ["weballow2", "102", "9090", "VirtualNetwork"],
+        # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix]"
+        ["weballow", "100", "Inbound", "Allow", "Tcp", "80", "*"],
+        ["weballow1", "101", "Inbound", "Allow", "Tcp", "443", "AzureLoadBalancer"],
+        ["weballow2", "102", "Inbound", "Allow", "Tcp", "9090", "VirtualNetwork"],
       ]
     }
   }
+  
   # Adding TAG's to your Azure resources (Required)
   tags = {
     Terraform   = "true"
@@ -77,7 +78,7 @@ module "vnet" {
 
 ## Create resource group
 
-By default, this module will not create a resource group and the name of an existing resource group to be given in an argument `create_resource_group`. If you want to create a new resource group, set the argument `create_resource_group = true`.
+By default, this module will not create a resource group and the name of an existing resource group to be given in an argument `resource_group_name` and `location`. If you want to create a new resource group, set the argument `create_resource_group = true`.
 
 *If you are using an existing resource group, then this module uses the same resource group location to create all resources in this module.*
 
@@ -237,10 +238,10 @@ module "vnet" {
       subnet_address_prefix = "10.1.2.0/24"
 
       nsg_inbound_rule = [
-        # [name, priority, destination_port_range, source_address_prefix]"
-        ["weballow", "100", "80", "*"],
-        ["weballow1", "101", "443", "AzureLoadBalancer"],
-        ["weballow2", "102", "8080", "VirtualNetwork"],
+        # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix]"
+        ["weballow", "100", "Inbound", "Allow", "Tcp", "80", "*"],
+        ["weballow1", "101", "Inbound", "Allow", "Tcp", "443", "AzureLoadBalancer"],
+        ["weballow2", "102", "Inbound", "Allow", "Tcp", "9090", "VirtualNetwork"],
       ]
     }
   }
