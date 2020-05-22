@@ -299,6 +299,7 @@ Name | Description | Type | Default
 `delegation`|defines a subnet delegation feature. takes an object as described in the following example|object|`{}`
 `service_endpoints`|service endpoints for the virtual subnet|object|`{}`
 `nsg_inbound_rule`|network security groups settings - a NSG is always created for each subnet|object|`{}`
+`nsg_outbound_rule`|network security groups settings - a NSG is always created for each subnet|object|`{}`
 `create_ddos_plan` | Controls if DDoS protection plan should be created | string | `"false"`
 `ddos_plan_name`|Name of Azure Network DDoS protection plan| string | `""`
 `create_network_watcher`|Controls if Network Watcher resources should be created for the Azure subscription |string|`"true"`
