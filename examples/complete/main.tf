@@ -25,11 +25,15 @@ module "vnet" {
           actions = ["Microsoft.Network/virtualNetworks/subnets/join/action", "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action"]
         }
       }
-      nsg_inbound_rule = [
-        # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix]"
+      nsg_inbound_rules = [
+        # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix]
         ["weballow", "100", "Inbound", "Allow", "Tcp", "80", "*"],
         ["weballow1", "101", "Inbound", "Allow", "Tcp", "443", "*"],
         ["weballow2", "102", "Inbound", "Allow", "Tcp", "8080-8090", "*"],
+      ]
+
+      nsg_outbound_rules = [
+        # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix]
       ]
     }
 
@@ -38,11 +42,15 @@ module "vnet" {
       subnet_address_prefix = "10.1.3.0/24"
       service_endpoints     = ["Microsoft.Storage"]
 
-      nsg_inbound_rule = [
+      nsg_inbound_rules = [
         # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix]"
         ["weballow", "100", "Inbound", "Allow", "Tcp", "80", "*"],
         ["weballow1", "101", "Inbound", "Allow", "Tcp", "443", "AzureLoadBalancer"],
         ["weballow2", "102", "Inbound", "Allow", "Tcp", "9090", "VirtualNetwork"],
+      ]
+
+      nsg_outbound_rules = [
+        # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix]
       ]
     }
   }

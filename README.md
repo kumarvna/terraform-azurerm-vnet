@@ -45,11 +45,15 @@ module "vnet" {
           actions = ["Microsoft.Network/virtualNetworks/subnets/join/action", "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action"]
         }
       }
-      nsg_inbound_rule = [
-        # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix]"
+      nsg_inbound_rules = [
+        # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix]
         ["weballow", "100", "Inbound", "Allow", "Tcp", "80", "*"],
         ["weballow1", "101", "Inbound", "Allow", "Tcp", "443", "*"],
         ["weballow2", "102", "Inbound", "Allow", "Tcp", "8080-8090", "*"],
+      ]
+
+      nsg_outbound_rules = [
+        # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix]
       ]
     }
 
@@ -58,15 +62,19 @@ module "vnet" {
       subnet_address_prefix = "10.1.3.0/24"
       service_endpoints     = ["Microsoft.Storage"]
 
-      nsg_inbound_rule = [
+      nsg_inbound_rules = [
         # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix]"
         ["weballow", "100", "Inbound", "Allow", "Tcp", "80", "*"],
         ["weballow1", "101", "Inbound", "Allow", "Tcp", "443", "AzureLoadBalancer"],
         ["weballow2", "102", "Inbound", "Allow", "Tcp", "9090", "VirtualNetwork"],
       ]
+
+      nsg_outbound_rules = [
+        # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix]
+      ]
     }
   }
-  
+
   # Adding TAG's to your Azure resources (Required)
   tags = {
     Terraform   = "true"
@@ -222,7 +230,7 @@ By default, this enabled to create the necessary resources in that region. You c
 
 ## Network Security Groups
 
-By default, the network security groups connected to Management and ApplicationGateway will only allow necessary traffic and block everything else (deny-all rule). Use the `nsg_inbound_rule` in this Terraform module creates a Network Security Group (NSG) for each subnet and allow to add additional rules for inbound flows.
+By default, the network security groups connected to Management and ApplicationGateway will only allow necessary traffic and block everything else (deny-all rule). Use `nsg_inbound_rules` and `nsg_outbound_rules` in this Terraform module to create a Network Security Group (NSG) for each subnet and allow it to add additional rules for inbound flows.
 
 For `source_address_prefix` argument provide CIDR or source IP range or * to match any IP. Tags such as `VirtualNetwork`, `AzureLoadBalancer` and `Internet` can also be used. 
 
@@ -239,11 +247,15 @@ module "vnet" {
       subnet_name           = "snet-gw01"
       subnet_address_prefix = "10.1.2.0/24"
 
-      nsg_inbound_rule = [
+      nsg_inbound_rules = [
         # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix]"
         ["weballow", "100", "Inbound", "Allow", "Tcp", "80", "*"],
         ["weballow1", "101", "Inbound", "Allow", "Tcp", "443", "AzureLoadBalancer"],
         ["weballow2", "102", "Inbound", "Allow", "Tcp", "9090", "VirtualNetwork"],
+      ]
+
+      nsg_outbound_rules = [
+        # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix]
       ]
     }
   }

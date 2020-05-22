@@ -12,7 +12,7 @@ module "vnet" {
   version = "1.3.0"
 
   # Using Custom names and VNet/subnet Address Prefix (Recommended)
-  create_resource_group = true
+  create_resource_group = false
   resource_group_name   = "rg-demo-westeurope-01"
   vnetwork_name         = "vnet-demo-westeurope-001"
   location              = "westeurope"

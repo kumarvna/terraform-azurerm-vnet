@@ -45,12 +45,6 @@ output "network_security_group_ids" {
   value       = module.vnet.network_security_group_ids
 }
 
-output "network_security_group" {
-  description = "Network security group details"
-  value       = module.vnet.network_security_group
-}
-
-
 # DDoS Protection plan
 output "ddos_protection_plan" {
   description = "Ddos protection plan details"

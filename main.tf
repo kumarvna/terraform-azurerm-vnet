@@ -100,7 +100,7 @@ resource "azurerm_network_security_group" "nsg" {
   location            = local.location
   tags                = merge({ "Name" = format("%s", each.key) }, var.tags, )
   dynamic "security_rule" {
-    for_each = concat(lookup(each.value, "nsg_inbound_rule", []))
+    for_each = concat(lookup(each.value, "nsg_inbound_rules", []), lookup(each.value, "nsg_outbound_rules", []))
     content {
       name                       = security_rule.value[0]
       priority                   = security_rule.value[1]
