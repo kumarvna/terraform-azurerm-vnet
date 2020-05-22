@@ -4,7 +4,7 @@ Configuration in this directory creates a set of Azure network resources. Few of
 
 ## Create resource group
 
-By default, this module will not create a resource group and the name of an existing resource group to be given in an argument `resource_group_name` and `location`. If you want to create a new resource group, set the argument `create_resource_group = true`.
+By default, this module will not create a resource group and the name of an existing resource group to be given in an argument `resource_group_name`. If you want to create a new resource group, set the argument `create_resource_group = true`.
 
 *If you are using an existing resource group, then this module uses the same resource group location to create all resources in this module.*
 

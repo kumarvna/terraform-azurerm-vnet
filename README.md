@@ -78,7 +78,7 @@ module "vnet" {
 
 ## Create resource group
 
-By default, this module will not create a resource group and the name of an existing resource group to be given in an argument `resource_group_name` and `location`. If you want to create a new resource group, set the argument `create_resource_group = true`.
+By default, this module will not create a resource group and the name of an existing resource group to be given in an argument `resource_group_name`. If you want to create a new resource group, set the argument `create_resource_group = true`.
 
 *If you are using an existing resource group, then this module uses the same resource group location to create all resources in this module.*
 
@@ -88,7 +88,9 @@ By default, this module will not create a DDoS Protection Plan. You can enable i
 
 ## Subnets
 
-This module handles the creation and a list of address spaces for subnets. The subnet creation is using `for_each` to create subnets and corresponding service endpoints, service delegation, and network security groups. This module associates the subnets to network security groups as well.  It is also possible to add other routes to the associated route tables outside of this module.
+This module handles the creation and a list of address spaces for subnets. The subnet creation is using `for_each` to create subnets and corresponding service endpoints, service delegation, and network security groups. This module associates the subnets to network security groups as well.  
+
+It is also possible to add other routes to the associated route tables outside of this module.
 
 ## Virtual Network service endpoints
 
