@@ -26,17 +26,17 @@ module "vnet" {
         }
       }
       nsg_inbound_rules = [
-        # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix, destination_address_prefix, description]
-        # To use defaults, use "" without adding any values. (Applicable to destination_port_range, source_address_prefix, destination_address_prefix, description).
-        ["weballow", "100", "Inbound", "Allow", "Tcp", "80", "*", "0.0.0.0/0", "http_80"],
-        ["weballow1", "101", "Inbound", "Allow", "", "443", "*", "", "https_443"],
+        # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix, destination_address_prefix]
+        # To use defaults, use "" without adding any values.
+        ["weballow", "100", "Inbound", "Allow", "Tcp", "80", "*", "0.0.0.0/0"],
+        ["weballow1", "101", "Inbound", "Allow", "", "443", "*", ""],
         ["weballow2", "102", "Inbound", "Allow", "Tcp", "8080-8090", "*", ""],
       ]
 
       nsg_outbound_rules = [
-        # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix, destination_address_prefix, description]
-        # To use defaults, use "" without adding any values. (Applicable to destination_port_range, source_address_prefix, destination_address_prefix, description).
-        ["ntp_out", "103", "Outbound", "Allow", "Udp", "123", "", "0.0.0.0/0", ""],
+        # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix, destination_address_prefix]
+        # To use defaults, use "" without adding any values.
+        ["ntp_out", "103", "Outbound", "Allow", "Udp", "123", "", "0.0.0.0/0"],
       ]
     }
 
@@ -46,16 +46,16 @@ module "vnet" {
       service_endpoints     = ["Microsoft.Storage"]
 
       nsg_inbound_rules = [
-        # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix, destination_address_prefix, description]
-        # To use defaults, use "" without adding any values. (Applicable to destination_port_range, source_address_prefix, destination_address_prefix, description).
-        ["weballow", "100", "Inbound", "Allow", "Tcp", "80", "*", "", "http_80"],
-        ["weballow1", "101", "Inbound", "Allow", "Tcp", "443", "AzureLoadBalancer", "", "https_443"],
-        ["weballow2", "102", "Inbound", "Allow", "Tcp", "9090", "VirtualNetwork", "", "http_9090"],
+        # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix, destination_address_prefix]
+        # To use defaults, use "" without adding any values.
+        ["weballow", "200", "Inbound", "Allow", "Tcp", "80", "*", ""],
+        ["weballow1", "201", "Inbound", "Allow", "Tcp", "443", "AzureLoadBalancer", ""],
+        ["weballow2", "202", "Inbound", "Allow", "Tcp", "9090", "VirtualNetwork", ""],
       ]
 
       nsg_outbound_rules = [
-        # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix, destination_address_prefix, description]
-        # To use defaults, use "" without adding any values. (Applicable to destination_port_range, source_address_prefix, destination_address_prefix, description).
+        # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix, destination_address_prefix]
+        # To use defaults, use "" without adding any values.
       ]
     }
   }
