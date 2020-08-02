@@ -1,7 +1,7 @@
 module "vnet" {
-  // source  = "kumarvna/vnet/azurerm"
-  // version = "1.3.0"
-  source = "../../"
+  source  = "kumarvna/vnet/azurerm"
+  version = "1.3.0"
+
   # Using Custom names and VNet/subnet Address Prefix (Recommended)
   create_resource_group = true
   resource_group_name   = "rg-demo-westeurope-01"

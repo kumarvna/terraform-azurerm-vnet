@@ -4,30 +4,30 @@ Configuration in this directory creates a set of Azure network resources. Few of
 
 ## Module Usage
 
-Following example to create a simple virtual network with subnets and network watcher resources. Please see the complete example to add rest of the features in this module. 
+Following example to create a simple virtual network with subnets and network watcher resources. Please see the complete example to add rest of the features in this module.
 
-```
+```hcl
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
   version = "1.3.0"
 
   # Using Custom names and VNet/subnet Address Prefix (Recommended)
-  create_resource_group = false
+  create_resource_group = true
   resource_group_name   = "rg-demo-westeurope-01"
   vnetwork_name         = "vnet-demo-westeurope-001"
   location              = "westeurope"
   vnet_address_space    = ["10.1.0.0/16"]
 
-  # Multiple Subnets, Service delegation, Service Endpoints, Network security groups
+  # Multiple Subnets, Service delegation, Service Endpoints
   subnets = {
     gw_subnet = {
       subnet_name           = "snet-gw01"
-      subnet_address_prefix = "10.1.2.0/24"
+      subnet_address_prefix = ["10.1.2.0/24"]
     }
 
     app_subnet = {
       subnet_name           = "snet-app01"
-      subnet_address_prefix = "10.1.3.0/24"
+      subnet_address_prefix = ["10.1.3.0/24"]
     }
   }
 
@@ -44,10 +44,27 @@ module "vnet" {
 
 To run this example you need to execute following Terraform commands
 
-```
-$ terraform init
-$ terraform plan
-$ terraform apply
+```hcl
+terraform init
+terraform plan
+terraform apply
 ```
 
 Run `terraform destroy` when you don't need these resources.
+
+## Outputs
+
+Name | Description
+---- | -----------
+`resource_group_name` | The name of the resource group in which resources are created
+`resource_group_id` | The id of the resource group in which resources are created
+`resource_group_location`| The location of the resource group in which resources are created
+`virtual_network_name` | The name of the virtual network.
+`virtual_network_id` |The virtual NetworkConfiguration ID.
+`virtual_network_address_space` | List of address spaces that are used the virtual network.
+`subnet_ids` | List of IDs of subnets
+`subnet_address_prefixes` | List of address prefix for  subnets
+`network_security_group_ids`|List of Network security groups and ids
+`network_security_group`|Network security group details - Useful for splat expression.
+`ddos_protection_plan` | Azure Network DDoS protection plan
+`network_watcher_id` | ID of Network Watcher

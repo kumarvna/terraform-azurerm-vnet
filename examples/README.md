@@ -1,65 +1,20 @@
 # Virtual Network resource creation example
 
-Configuration in this directory creates a set of Azure network resources. Few of these resources added/excluded as per your requirement.
-
-## Create resource group
-
-By default, this module will not create a resource group and the name of an existing resource group to be given in an argument `resource_group_name`. If you want to create a new resource group, set the argument `create_resource_group = true`.
-
-*If you are using an existing resource group, then this module uses the same resource group location to create all resources in this module.*
-
-## Adding Network Watcher to your Subscription
-
-This is a must value and note that you cannot create more than one network watcher resource per subscription in any region. You can exclude this from the Terraform plan using `create_network_watcher = false` argument in case you already have a network watcher available in your subscription.
-
-By default, this enabled. Only "true" or "false" values accepted.
-
-## Adding the Azure Network DDoS Protection Plan
-
-This is an optional resource.  You can add a DDoS standard plan to VPC by providing appropriate value to the argument `create_ddos_plan = false`.  
-
-By default, this not enabled. Only "true" or "false" values are accepted.
-
-## Adding your own DNS servers
-
-This is an optional and only applicable if you are using different DNS servers in Azure than its provided by default. Provide appropriate values to the argument `dns_servers = ["4.4.4.4"]`.
-
-By default, this not enabled. Only IPs expected here. If you have multiple DNS servers, then values to the argument `dns_servers = ["4.4.4.4","8.8.8.8"]`
-
-## Tagging
-
-Use tags to organize your Azure resources and management hierarchy. You can apply tags to your Azure resources, resource groups, and subscriptions to logically organize them into a taxonomy. Each tag consists of a name and a value pair. For example, you can apply the name "Environment" and the value "Production" to all the resources in production. You can manage these values variables directly or mapping as a variable using `variables.tf`.
-
-All Azure resources which support tagging can be tagged by specifying key-values in argument `tags`. Tag Name is added automatically on all resources. For example, you can specify `tags` like this:
-
-```
-module "vnet" {
-  source  = "kumarvna/vnet/azurerm"
-  version = "1.3.0"
-
-  # ... omitted
-
-  tags = {
-    Terraform   = "true"
-    Environment = "dev"
-    Owner       = "test-user"
-  }
-}  
-```
+Terraform Module to create a set of Azure network resources. Few of these resources added/excluded as per your requirement.
 
 ## Module Usage
 
-## Basic VNet
+### Basic VNet
 
 Following example to create a virtual network with subnets and network watcher resources.
 
-```
+```hcl
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
   version = "1.3.0"
 
   # Using Custom names and VNet/subnet Address Prefix (Recommended)
-  create_resource_group = false
+  create_resource_group = true
   resource_group_name   = "rg-demo-westeurope-01"
   vnetwork_name         = "vnet-demo-westeurope-001"
   location              = "westeurope"
@@ -69,12 +24,12 @@ module "vnet" {
   subnets = {
     gw_subnet = {
       subnet_name           = "snet-gw01"
-      subnet_address_prefix = "10.1.2.0/24"
+      subnet_address_prefix = ["10.1.2.0/24"]
     }
 
     app_subnet = {
       subnet_name           = "snet-app01"
-      subnet_address_prefix = "10.1.3.0/24"
+      subnet_address_prefix = ["10.1.3.0/24"]
     }
   }
 
@@ -87,18 +42,17 @@ module "vnet" {
 }
 ```
 
-## VNet with all additional features
+### VNet with all additional features
 
 Following example to create a virtual network with subnets, NSG, DDoS protection plan, and network watcher resources.
 
-
-```
+```hcl
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
   version = "1.3.0"
 
   # Using Custom names and VNet/subnet Address Prefix (Recommended)
-  create_resource_group = false
+  create_resource_group = true
   resource_group_name   = "rg-demo-westeurope-01"
   vnetwork_name         = "vnet-demo-westeurope-001"
   location              = "westeurope"
@@ -112,7 +66,7 @@ module "vnet" {
   subnets = {
     gw_subnet = {
       subnet_name           = "snet-gw01"
-      subnet_address_prefix = "10.1.2.0/24"
+      subnet_address_prefix = ["10.1.2.0/24"]
       delegation = {
         name = "demodelegationcg"
         service_delegation = {
@@ -137,7 +91,7 @@ module "vnet" {
 
     app_subnet = {
       subnet_name           = "snet-app01"
-      subnet_address_prefix = "10.1.3.0/24"
+      subnet_address_prefix = ["10.1.3.0/24"]
       service_endpoints     = ["Microsoft.Storage"]
 
       nsg_inbound_rules = [
@@ -168,10 +122,10 @@ module "vnet" {
 
 To run this example you need to execute following Terraform commands
 
-```
-$ terraform init
-$ terraform plan
-$ terraform apply
+```hcl
+terraform init
+terraform plan
+terraform apply
 ```
 
 Run `terraform destroy` when you don't need these resources.

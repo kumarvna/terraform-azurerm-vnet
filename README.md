@@ -12,18 +12,17 @@ These types of resources are supported:
 * [Network Watcher](https://www.terraform.io/docs/providers/azurerm/r/network_watcher.html)
 * [Network Security Groups](https://www.terraform.io/docs/providers/azurerm/r/network_security_group.html)
 
-
 ## Module Usage
 
 Following example to create a virtual network with subnets, NSG, DDoS protection plan, and network watcher resources.
 
-```
+```hcl
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
   version = "1.3.0"
 
   # Using Custom names and VNet/subnet Address Prefix (Recommended)
-  create_resource_group = false
+  create_resource_group = true
   resource_group_name   = "rg-demo-westeurope-01"
   vnetwork_name         = "vnet-demo-westeurope-001"
   location              = "westeurope"
@@ -37,7 +36,7 @@ module "vnet" {
   subnets = {
     gw_subnet = {
       subnet_name           = "snet-gw01"
-      subnet_address_prefix = "10.1.2.0/24"
+      subnet_address_prefix = ["10.1.2.0/24"]
       delegation = {
         name = "demodelegationcg"
         service_delegation = {
@@ -62,7 +61,7 @@ module "vnet" {
 
     app_subnet = {
       subnet_name           = "snet-app01"
-      subnet_address_prefix = "10.1.3.0/24"
+      subnet_address_prefix = ["10.1.3.0/24"]
       service_endpoints     = ["Microsoft.Storage"]
 
       nsg_inbound_rules = [
@@ -91,17 +90,21 @@ module "vnet" {
 
 ## Create resource group
 
-By default, this module will not create a resource group and the name of an existing resource group to be given in an argument `resource_group_name`. If you want to create a new resource group, set the argument `create_resource_group = true`.
+By default, this module will create a resource group and the name of the resource group to be given in an argument `resource_group_name`. If you want to use an existing resource group, specify the existing resource group name, and set the argument to `create_resource_group = false`.
 
-*If you are using an existing resource group, then this module uses the same resource group location to create all resources in this module.*
+> *If you are using an existing resource group, then this module uses the same resource group location to create all resources in this module.*
 
 ## Azure Network DDoS Protection Plan
 
-By default, this module will not create a DDoS Protection Plan. You can enable it by appending an argument `create_ddos_plan`. If you want to create a DDoS plan using this module, set argument `create_ddos_plan = true`
+By default, this module will create a DDoS Protection Plan. You can enable/disable it by appending an argument `create_ddos_plan`. If you want to disable a DDoS plan using this module, set argument `create_ddos_plan = false`.
+
+## Custom DNS servers
+
+This is an optional feature and only applicable if you are using your own DNS servers superseding default DNS services provided by Azure.Set the argument `dns_servers = ["4.4.4.4"]` to enable this option. For multiple DNS servers, set the argument `dns_servers = ["4.4.4.4", "8.8.8.8"]`
 
 ## Subnets
 
-This module handles the creation and a list of address spaces for subnets. The subnet creation is using `for_each` to create subnets and corresponding service endpoints, service delegation, and network security groups. This module associates the subnets to network security groups as well.  
+This module handles the creation and a list of address spaces for subnets. This module uses `for_each` to create subnets and corresponding service endpoints, service delegation, and network security groups. This module associates the subnets to network security groups as well with additional user-defined NSG rules.
 
 It is also possible to add other routes to the associated route tables outside of this module.
 
@@ -111,18 +114,18 @@ Service Endpoints allows connecting certain platform services into virtual netwo
 
 This module supports enabling the service endpoint of your choosing under the virtual network and with the specified subnet. The list of Service endpoints to associate with the subnet values include: `Microsoft.AzureActiveDirectory`, `Microsoft.AzureCosmosDB`, `Microsoft.ContainerRegistry`, `Microsoft.EventHub`, `Microsoft.KeyVault`, `Microsoft.ServiceBus`, `Microsoft.Sql`, `Microsoft.Storage` and `Microsoft.Web`.
 
-```
+```hcl
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
   version = "1.3.0"
 
   # .... omitted
 
-  # Multiple Subnets, Service delegation, Service Endpoints 
+  # Multiple Subnets, Service delegation, Service Endpoints
   subnets = {
     gw_subnet = {
       subnet_name           = "snet-gw01"
-      subnet_address_prefix = "10.1.2.0/24"
+      subnet_address_prefix = ["10.1.2.0/24"]
 
       service_endpoints     = ["Microsoft.Storage"]  
     }
@@ -139,18 +142,18 @@ Subnet delegation enables you to designate a specific subnet for an Azure PaaS s
 
 This module supports enabling the service delegation of your choosing under the virtual network and with the specified subnet.  For more information, check the [terraform resource documentation](https://www.terraform.io/docs/providers/azurerm/r/subnet.html#service_delegation).
 
-```
+```hcl
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
   version = "1.3.0"
 
   # .... omitted
 
-  # Multiple Subnets, Service delegation, Service Endpoints 
+  # Multiple Subnets, Service delegation, Service Endpoints
   subnets = {
     gw_subnet = {
       subnet_name           = "snet-gw01"
-      subnet_address_prefix = "10.1.2.0/24"
+      subnet_address_prefix = ["10.1.2.0/24"]
 
       delegation = {
         name = "demodelegationcg"
@@ -169,22 +172,22 @@ module "vnet" {
 
 ## `enforce_private_link_endpoint_network_policies` - Private Link Endpoint on the subnet
 
-Network policies, like network security groups (NSG), are not supported for Private Link Endpoints=. In order to deploy a Private Link Endpoint on a given subnet, you must set the `enforce_private_link_endpoint_network_policies` attribute to `true`. This setting is only applicable for the Private Link Endpoint, for all other resources in the subnet access is controlled based via the Network Security Group which can be configured using the `azurerm_subnet_network_security_group_association` resource. 
+Network policies, like network security groups (NSG), are not supported for Private Link Endpoints. In order to deploy a Private Link Endpoint on a given subnet, you must set the `enforce_private_link_endpoint_network_policies` attribute to `true`. This setting is only applicable for the Private Link Endpoint, for all other resources in the subnet access is controlled based via the Network Security Group which can be configured using the `azurerm_subnet_network_security_group_association` resource.
 
-This module Enable or Disable network policies for the private link endpoint on the subnet. The default value is `false`. If you are enabling the Private Link Endpoints on the subnet you shouldn't use Private Link Services as it's conflicts. 
+This module Enable or Disable network policies for the private link endpoint on the subnet. The default value is `false`. If you are enabling the Private Link Endpoints on the subnet you shouldn't use Private Link Services as it's conflicts.
 
-```
+```hcl
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
   version = "1.3.0"
 
   # .... omitted
 
-  # Multiple Subnets, Service delegation, Service Endpoints 
+  # Multiple Subnets, Service delegation, Service Endpoints
   subnets = {
     gw_subnet = {
       subnet_name           = "snet-gw01"
-      subnet_address_prefix = "10.1.2.0/24"
+      subnet_address_prefix = ["10.1.2.0/24"]
       enforce_private_link_endpoint_network_policies = true
 
         }
@@ -201,21 +204,21 @@ module "vnet" {
 
 In order to deploy a Private Link Service on a given subnet, you must set the `enforce_private_link_service_network_policies` attribute to `true`. This setting is only applicable for the Private Link Service, for all other resources in the subnet access is controlled based on the Network Security Group which can be configured using the `azurerm_subnet_network_security_group_association` resource.
 
-This module Enable or Disable network policies for the private link service on the subnet. The default value is `false`. If you are enabling the Private Link service on the subnet then, you shouldn't use Private Link endpoints as it's conflicts. 
+This module Enable or Disable network policies for the private link service on the subnet. The default value is `false`. If you are enabling the Private Link service on the subnet then, you shouldn't use Private Link endpoints as it's conflicts.
 
-```
+```hcl
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
   version = "1.3.0"
 
   # .... omitted
 
-  # Multiple Subnets, Service delegation, Service Endpoints 
+  # Multiple Subnets, Service delegation, Service Endpoints
   subnets = {
     gw_subnet = {
       subnet_name           = "snet-gw01"
-      subnet_address_prefix = "10.1.2.0/24"
-      enforce_private_link_endpoint_network_policies = true
+      subnet_address_prefix = ["10.1.2.0/24"]
+      enforce_private_link_service_network_policies = true
 
         }
       }
@@ -229,9 +232,7 @@ module "vnet" {
 
 ## Network Watcher
 
-This module handle the provision of Network Watcher. Note that you cannot create more than one network watcher resource per subscription in any region.
-
-By default, this enabled to create the necessary resources in that region. You can exclude this from the Terraform plan using `create_network_watcher = false` argument in case you already have a network watcher available in your subscription.
+This module handle the provision of Network Watcher resource by defining `create_network_watcher` variable. It will enable network watcher, flow logs and traffic analytics for all the subnets in the Virtual Network. Since Azure uses a specific naming standard on network watchers, It will create a resource group `NetworkWatcherRG` and adds the location specific resource.
 
 ## Network Security Groups
 
@@ -241,18 +242,18 @@ In the Source and Destination columns, `VirtualNetwork`, `AzureLoadBalancer`, an
 
 *You cannot remove the default rules, but you can override them by creating rules with higher priorities.*
 
-```
+```hcl
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
   version = "1.3.0"
 
   # .... omitted
 
-  # Multiple Subnets, Service delegation, Service Endpoints 
+  # Multiple Subnets, Service delegation, Service Endpoints
   subnets = {
     gw_subnet = {
       subnet_name           = "snet-gw01"
-      subnet_address_prefix = "10.1.2.0/24"
+      subnet_address_prefix = ["10.1.2.0/24"]
 
      nsg_inbound_rules = [
         # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix, destination_address_prefix]
@@ -260,7 +261,7 @@ module "vnet" {
         ["weballow", "100", "Inbound", "Allow", "Tcp", "80", "*", "", "http_80"],
         ["weballow1", "101", "Inbound", "Allow", "Tcp", "443", "AzureLoadBalancer", "", "https_443"],
         ["weballow2", "102", "Inbound", "Allow", "Tcp", "9090", "VirtualNetwork", "", "http_9090"],
-      ] 
+      ]
 
       nsg_outbound_rules = [
         # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix, destination_address_prefix]
@@ -278,7 +279,7 @@ Use tags to organize your Azure resources and management hierarchy. You can appl
 
 All Azure resources which support tagging can be tagged by specifying key-values in argument `tags`. Tag Name is added automatically on all resources. For example, you can specify `tags` like this:
 
-```
+```hcl
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
   version = "1.3.0"
@@ -301,8 +302,8 @@ Name | Description | Type | Default
 `resource_group_name` | The name of the resource group in which resources are created | string | `""`
 `location`|The location of the resource group in which resources are created| string | `""`
 `vnetwork_name`|The name of the virtual network| string | `""`
-`vnet_address_space`|Virutal Nework address space to be used |list|`[]`
-`dns_servers` | List of dns servers to use for virtual network | list |`[]`
+`vnet_address_space`|Virtual Network address space to be used |list|`[]`
+`dns_servers` | List of DNS servers to use for virtual network | list |`[]`
 `subnets`|For each subnet, create an object that contain fields|object|`{}`
 `subnet_name`|A name of subnets inside virtual network| object |`{}`
 `subnet_address_prefix`|A list of subnets address prefixes inside virtual network| list |`{}`
