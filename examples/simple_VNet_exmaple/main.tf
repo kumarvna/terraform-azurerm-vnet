@@ -1,7 +1,7 @@
 module "vnet" {
-  source  = "kumarvna/vnet/azurerm"
-  version = "1.3.0"
-
+  // source  = "kumarvna/vnet/azurerm"
+  // version = "1.3.0"
+  source = "../../"
   # Using Custom names and VNet/subnet Address Prefix (Recommended)
   create_resource_group = true
   resource_group_name   = "rg-demo-westeurope-01"
@@ -13,12 +13,12 @@ module "vnet" {
   subnets = {
     gw_subnet = {
       subnet_name           = "snet-gw01"
-      subnet_address_prefix = "10.1.2.0/24"
+      subnet_address_prefix = ["10.1.2.0/24"]
     }
 
     app_subnet = {
       subnet_name           = "snet-app01"
-      subnet_address_prefix = "10.1.3.0/24"
+      subnet_address_prefix = ["10.1.3.0/24"]
     }
   }
 

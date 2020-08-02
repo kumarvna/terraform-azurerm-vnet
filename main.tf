@@ -73,7 +73,7 @@ resource "azurerm_subnet" "snet" {
   name                                           = each.value.subnet_name
   resource_group_name                            = local.resource_group_name
   virtual_network_name                           = azurerm_virtual_network.vnet.name
-  address_prefix                                 = each.value.subnet_address_prefix
+  address_prefixes                               = each.value.subnet_address_prefix
   service_endpoints                              = lookup(each.value, "service_endpoints", [])
   enforce_private_link_endpoint_network_policies = lookup(each.value, "enforce_private_link_endpoint_network_policies", null)
   enforce_private_link_service_network_policies  = lookup(each.value, "enforce_private_link_service_network_policies", null)
@@ -95,10 +95,10 @@ resource "azurerm_subnet" "snet" {
 #-----------------------------------------------
 resource "azurerm_network_security_group" "nsg" {
   for_each            = var.subnets
-  name                = "nsg_${each.key}_allow"
+  name                = lower("nsg_${each.key}_in")
   resource_group_name = local.resource_group_name
   location            = local.location
-  tags                = merge({ "Name" = format("%s", each.key) }, var.tags, )
+  tags                = merge({ "ResourceName" = lower("nsg_${each.key}_in") }, var.tags, )
   dynamic "security_rule" {
     for_each = concat(lookup(each.value, "nsg_inbound_rules", []), lookup(each.value, "nsg_outbound_rules", []))
     content {
@@ -109,8 +109,8 @@ resource "azurerm_network_security_group" "nsg" {
       protocol                   = security_rule.value[4] == "" ? "Tcp" : security_rule.value[4]
       source_port_range          = "*"
       destination_port_range     = security_rule.value[5] == "" ? "*" : security_rule.value[5]
-      source_address_prefix      = security_rule.value[6] == "" ? each.value.subnet_address_prefix : security_rule.value[6]
-      destination_address_prefix = security_rule.value[7] == "" ? each.value.subnet_address_prefix : security_rule.value[7]
+      source_address_prefix      = security_rule.value[6] == "" ? element(each.value.subnet_address_prefix, 0) : security_rule.value[6]
+      destination_address_prefix = security_rule.value[7] == "" ? element(each.value.subnet_address_prefix, 0) : security_rule.value[7]
       description                = "${security_rule.value[2]}_Port_${security_rule.value[5]}"
     }
   }
