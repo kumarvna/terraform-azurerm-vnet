@@ -43,11 +43,6 @@ variable "create_network_watcher" {
   default     = true
 }
 
-variable "netwatcher_name" {
-  description = "The name of the Network Watcher"
-  default     = "demo-nwwatcher"
-}
-
 variable "subnets" {
   description = "For each subnet, create an object that contain fields"
   default     = {}
