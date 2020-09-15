@@ -1,44 +1,51 @@
 # Azure Virtual Network Terraform Module
 
-Terraform Module to create a set of Azure network resources. Few of these resources added/excluded as per your requirement.
+Terraform Module to create Azure virtual network with optional NSG, Service delegation, service endpoints, AzureFirewallSubnet and GatewaySubnet creation.
 
-These types of resources are supported:
+Type of resources are supported:
 
 * [Virtual Network](https://www.terraform.io/docs/providers/azurerm/r/virtual_network.html)
 * [Subnets](https://www.terraform.io/docs/providers/azurerm/r/subnet.html)
 * [Subnet Service Delegation](https://www.terraform.io/docs/providers/azurerm/r/subnet.html#delegation)
 * [Virtual Network service endpoints](https://www.terraform.io/docs/providers/azurerm/r/subnet.html#service_endpoints)
+* [Private Link service/Endpoint network policies on Subnet](https://www.terraform.io/docs/providers/azurerm/r/subnet.html#enforce_private_link_endpoint_network_policies)
 * [AzureNetwork DDoS Protection Plan](https://www.terraform.io/docs/providers/azurerm/r/network_ddos_protection_plan.html)
 * [Network Watcher](https://www.terraform.io/docs/providers/azurerm/r/network_watcher.html)
 * [Network Security Groups](https://www.terraform.io/docs/providers/azurerm/r/network_security_group.html)
 
 ## Module Usage
 
-Following example to create a virtual network with subnets, NSG, DDoS protection plan, and network watcher resources.
-
 ```hcl
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
-  version = "1.3.0"
+  version = "2.0.0"
 
-  # Using Custom names and VNet/subnet Address Prefix (Recommended)
-  create_resource_group = true
-  resource_group_name   = "rg-demo-westeurope-01"
-  vnetwork_name         = "vnet-demo-westeurope-001"
-  location              = "westeurope"
-  vnet_address_space    = ["10.1.0.0/16"]
+  # By default, this module will not create a resource group, proivde the name here
+  # to use an existing resource group, specify the existing resource group name,
+  # and set the argument to `create_resource_group = true`. Location will be same as existing RG.
+  create_resource_group          = true
+  resource_group_name            = "rg-demo-westeurope-01"
+  vnetwork_name                  = "vnet-demo-westeurope-001"
+  location                       = "westeurope"
+  vnet_address_space             = ["10.1.0.0/16"]
+  firewall_subnet_address_prefix = ["10.1.0.0/26"]
+  gateway_subnet_address_prefix  = ["10.1.1.0/27"]
 
   # Adding Standard DDoS Plan, and custom DNS servers (Optional)
   create_ddos_plan = true
-  dns_servers      = []
 
   # Multiple Subnets, Service delegation, Service Endpoints, Network security groups
+  # These are default subnets with required configuration, check README.md for more details
+  # NSG association to be added automatically for all subnets listed here.
+  # First two address ranges from VNet Address space reserved for Gateway And Firewall Subnets.
+  # ex.: For 10.1.0.0/16 address space, usable address range start from 10.1.2.0/24 for all subnets.
+  # subnet name will be set as per Azure naming convention by defaut. expected value here is: <App or project name>
   subnets = {
-    gw_subnet = {
-      subnet_name           = "snet-gw01"
+    mgnt_subnet = {
+      subnet_name           = "management"
       subnet_address_prefix = ["10.1.2.0/24"]
       delegation = {
-        name = "demodelegationcg"
+        name = "testdelegation"
         service_delegation = {
           name    = "Microsoft.ContainerInstance/containerGroups"
           actions = ["Microsoft.Network/virtualNetworks/subnets/join/action", "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action"]
@@ -59,8 +66,8 @@ module "vnet" {
       ]
     }
 
-    app_subnet = {
-      subnet_name           = "snet-app01"
+    dmz_subnet = {
+      subnet_name           = "appgateway"
       subnet_address_prefix = ["10.1.3.0/24"]
       service_endpoints     = ["Microsoft.Storage"]
 
@@ -81,9 +88,11 @@ module "vnet" {
 
   # Adding TAG's to your Azure resources (Required)
   tags = {
-    Terraform   = "true"
-    Environment = "dev"
-    Owner       = "test-user"
+    ProjectName  = "demo-internal"
+    Env          = "dev"
+    Owner        = "user@example.com"
+    BusinessUnit = "CORP"
+    ServiceClass = "Gold"
   }
 }
 ```
@@ -96,7 +105,7 @@ By default, this module will create a resource group and the name of the resourc
 
 ## Azure Network DDoS Protection Plan
 
-By default, this module will create a DDoS Protection Plan. You can enable/disable it by appending an argument `create_ddos_plan`. If you want to disable a DDoS plan using this module, set argument `create_ddos_plan = false`.
+By default, this module will not create a DDoS Protection Plan. You can enable/disable it by appending an argument `create_ddos_plan`. If you want to enable a DDoS protection plan using this module, set the argument `create_ddos_plan = true`.
 
 ## Custom DNS servers
 
@@ -104,9 +113,15 @@ This is an optional feature and only applicable if you are using your own DNS se
 
 ## Subnets
 
-This module handles the creation and a list of address spaces for subnets. This module uses `for_each` to create subnets and corresponding service endpoints, service delegation, and network security groups. This module associates the subnets to network security groups as well with additional user-defined NSG rules.
+This module handles the following types of subnet creation:
 
-It is also possible to add other routes to the associated route tables outside of this module.
+* __Subnets__ - add, change, or delete of subnet supported. The subnet name and address range must be unique within the address space for the virtual network. A subnet may optionally have one or more service endpoints enabled for it. To enable a service endpoint for a service, select the service or services that you want to enable service endpoints for from the Services list. A subnet may optionally have one or more delegations enabled for it. Subnet delegation gives explicit permissions to the service to create service-specific resources in the subnet using a unique identifier during service deployment. To delegate for a service, select the service you want to delegate to from the Services list.
+
+* __GatewaySubnet__ - Subnet to provision VPN Gateway or Express route Gateway.  This can be created by setting up `gateway_subnet_address_prefix` argument with a valid address prefix. This subnet must have a name "AzureFirewallSubnet" and the mask of at least /27
+
+* __AzureFirewallSubnet__ - If added the Firewall module, this subnet is to deploys an Azure Firewall that will monitor all incoming and outgoing traffic.  This can be created by setting up `firewall_subnet_address_prefix` argument with a valid address prefix. This subnet must have a name "AzureFirewallSubnet" and the mask of at least /26
+
+It is also possible to add other routes to the associated route tables outside of this module. This module also creates network security groups for all subnets except Gateway and firewall subnets.
 
 ## Virtual Network service endpoints
 
@@ -117,15 +132,15 @@ This module supports enabling the service endpoint of your choosing under the vi
 ```hcl
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
-  version = "1.3.0"
+  version = "2.0.0"
 
   # .... omitted
 
   # Multiple Subnets, Service delegation, Service Endpoints
   subnets = {
-    gw_subnet = {
-      subnet_name           = "snet-gw01"
-      subnet_address_prefix = ["10.1.2.0/24"]
+    mgnt_subnet = {
+      subnet_name           = "management"
+      subnet_address_prefix = "10.1.2.0/24"
 
       service_endpoints     = ["Microsoft.Storage"]  
     }
@@ -136,7 +151,7 @@ module "vnet" {
 }
 ```
 
-## Subnet Service Endpoints
+## Subnet Service Delegation
 
 Subnet delegation enables you to designate a specific subnet for an Azure PaaS service of your choice that needs to be injected into your virtual network. The Subnet delegation provides full control to manage the integration of Azure services into virtual networks.
 
@@ -145,15 +160,15 @@ This module supports enabling the service delegation of your choosing under the 
 ```hcl
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
-  version = "1.3.0"
+  version = "2.0.0"
 
   # .... omitted
 
   # Multiple Subnets, Service delegation, Service Endpoints
   subnets = {
-    gw_subnet = {
-      subnet_name           = "snet-gw01"
-      subnet_address_prefix = ["10.1.2.0/24"]
+    mgnt_subnet = {
+      subnet_name           = "management"
+      subnet_address_prefix = "10.1.2.0/24"
 
       delegation = {
         name = "demodelegationcg"
@@ -179,15 +194,15 @@ This module Enable or Disable network policies for the private link endpoint on 
 ```hcl
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
-  version = "1.3.0"
+  version = "2.0.0"
 
   # .... omitted
 
   # Multiple Subnets, Service delegation, Service Endpoints
   subnets = {
-    gw_subnet = {
-      subnet_name           = "snet-gw01"
-      subnet_address_prefix = ["10.1.2.0/24"]
+    mgnt_subnet = {
+      subnet_name           = "management"
+      subnet_address_prefix = "10.1.2.0/24"
       enforce_private_link_endpoint_network_policies = true
 
         }
@@ -209,15 +224,15 @@ This module Enable or Disable network policies for the private link service on t
 ```hcl
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
-  version = "1.3.0"
+  version = "2.0.0"
 
   # .... omitted
 
   # Multiple Subnets, Service delegation, Service Endpoints
   subnets = {
-    gw_subnet = {
-      subnet_name           = "snet-gw01"
-      subnet_address_prefix = ["10.1.2.0/24"]
+    mgnt_subnet = {
+      subnet_name           = "management"
+      subnet_address_prefix = "10.1.2.0/24"
       enforce_private_link_service_network_policies = true
 
         }
@@ -245,14 +260,14 @@ In the Source and Destination columns, `VirtualNetwork`, `AzureLoadBalancer`, an
 ```hcl
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
-  version = "1.3.0"
+  version = "2.0.0"
 
   # .... omitted
 
   # Multiple Subnets, Service delegation, Service Endpoints
   subnets = {
-    gw_subnet = {
-      subnet_name           = "snet-gw01"
+    mgnt_subnet = {
+      subnet_name           = "management"
       subnet_address_prefix = ["10.1.2.0/24"]
 
      nsg_inbound_rules = [
@@ -273,25 +288,52 @@ module "vnet" {
 }
 ```
 
-## Tagging
+## Recommended naming and tagging conventions
 
-Use tags to organize your Azure resources and management hierarchy. You can apply tags to your Azure resources, resource groups, and subscriptions to logically organize them into a taxonomy. Each tag consists of a name and a value pair. For example, you can apply the name "Environment" and the value "Production" to all the resources in production. You can manage these values variables directly or mapping as a variable using `variables.tf`.
+Well-defined naming and metadata tagging conventions help to quickly locate and manage resources. These conventions also help associate cloud usage costs with business teams via chargeback and show back accounting mechanisms.
 
-All Azure resources which support tagging can be tagged by specifying key-values in argument `tags`. Tag Name is added automatically on all resources. For example, you can specify `tags` like this:
+> ### Resource naming
+
+An effective naming convention assembles resource names by using important resource information as parts of a resource's name. For example, using these [recommended naming conventions](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/naming-and-tagging#example-names), a public IP resource for a production SharePoint workload is named like this: `pip-sharepoint-prod-westus-001`.
+
+> ### Metadata tags
+
+When applying metadata tags to the cloud resources, you can include information about those assets that couldn't be included in the resource name. You can use that information to perform more sophisticated filtering and reporting on resources. This information can be used by IT or business teams to find resources or generate reports about resource usage and billing.
+
+The following list provides the recommended common tags that capture important context and information about resources. Use this list as a starting point to establish your tagging conventions.
+
+Tag Name|Description|Key|Example Value|Required?
+--------|-----------|---|-------------|---------|
+Project Name|Name of the Project for the infra is created. This is mandatory to create a resource names.|ProjectName|{Project name}|Yes
+Application Name|Name of the application, service, or workload the resource is associated with.|ApplicationName|{app name}|Yes
+Approver|Name Person responsible for approving costs related to this resource.|Approver|{email}|Yes
+Business Unit|Top-level division of your company that owns the subscription or workload the resource belongs to. In smaller organizations, this may represent a single corporate or shared top-level organizational element.|BusinessUnit|FINANCE, MARKETING,{Product Name},CORP,SHARED|Yes
+Cost Center|Accounting cost center associated with this resource.|CostCenter|{number}|Yes
+Disaster Recovery|Business criticality of this application, workload, or service.|DR|Mission Critical, Critical, Essential|Yes
+Environment|Deployment environment of this application, workload, or service.|Env|Prod, Dev, QA, Stage, Test|Yes
+Owner Name|Owner of the application, workload, or service.|Owner|{email}|Yes
+Requester Name|User that requested the creation of this application.|Requestor| {email}|Yes
+Service Class|Service Level Agreement level of this application, workload, or service.|ServiceClass|Dev, Bronze, Silver, Gold|Yes
+Start Date of the project|Date when this application, workload, or service was first deployed.|StartDate|{date}|No
+End Date of the Project|Date when this application, workload, or service is planned to be retired.|EndDate|{date}|No
+
+> This module allows you to manage the above metadata tags directly or as a variable using `variables.tf`. All Azure resources which support tagging can be tagged by specifying key-values in argument `tags`. Tag `ResourceName` is added automatically to all resources.
 
 ```hcl
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
-  version = "1.3.0"
+  version = "2.0.0"
 
   # ... omitted
 
   tags = {
-    Terraform   = "true"
-    Environment = "dev"
-    Owner       = "test-user"
+    ProjectName  = "demo-internal"
+    Env          = "dev"
+    Owner        = "user@example.com"
+    BusinessUnit = "CORP"
+    ServiceClass = "Gold"
   }
-}  
+}
 ```
 
 ## Inputs
@@ -307,6 +349,8 @@ Name | Description | Type | Default
 `subnets`|For each subnet, create an object that contain fields|object|`{}`
 `subnet_name`|A name of subnets inside virtual network| object |`{}`
 `subnet_address_prefix`|A list of subnets address prefixes inside virtual network| list |`{}`
+`gateway_subnet_address_prefix`|The address prefix to use for the gateway subnet|list|`null`
+`firewall_subnet_address_prefix`|The address prefix to use for the Firewall subnet|list|`[]`
 `delegation`|defines a subnet delegation feature. takes an object as described in the following example|object|`{}`
 `service_endpoints`|service endpoints for the virtual subnet|object|`{}`
 `nsg_inbound_rule`|network security groups settings - a NSG is always created for each subnet|object|`{}`
@@ -340,7 +384,7 @@ Name | Description
 
 ## Authors
 
-Module is maintained by [Kumaraswamy Vithanala](mailto:kumarvna@gmail.com) with the help from other awesome contributors.
+Originally created by [Kumaraswamy Vithanala](mailto:kumarvna@gmail.com)
 
 ## Other resources
 
