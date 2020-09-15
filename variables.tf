@@ -48,6 +48,30 @@ variable "subnets" {
   default     = {}
 }
 
+variable "gateway_subnet_address_prefix" {
+  description = "The address prefix to use for the gateway subnet"
+  default     = null
+}
+
+variable "firewall_subnet_address_prefix" {
+  description = "The address prefix to use for the Firewall subnet"
+  default     = null
+}
+
+variable "firewall_service_endpoints" {
+  description = "Service endpoints to add to the firewall subnet"
+  type        = list(string)
+  default = [
+    "Microsoft.AzureActiveDirectory",
+    "Microsoft.AzureCosmosDB",
+    "Microsoft.EventHub",
+    "Microsoft.KeyVault",
+    "Microsoft.ServiceBus",
+    "Microsoft.Sql",
+    "Microsoft.Storage",
+  ]
+}
+
 variable "tags" {
   description = "A map of tags to add to all resources"
   type        = map(string)

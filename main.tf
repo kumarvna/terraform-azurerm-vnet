@@ -1,6 +1,6 @@
-#---------------------------------------------------------
-# Resource Group Creation or selection - Default is "false"
-#----------------------------------------------------------
+#------------------------
+# Local declarations
+#------------------------
 locals {
   resource_group_name = element(coalescelist(data.azurerm_resource_group.rgrp.*.name, azurerm_resource_group.rg.*.name, [""]), 0)
   location            = element(coalescelist(data.azurerm_resource_group.rgrp.*.location, azurerm_resource_group.rg.*.location, [""]), 0)
@@ -71,9 +71,28 @@ resource "azurerm_network_watcher" "nwatcher" {
   tags                = merge({ "Name" = format("%s", "NetworkWatcher_${local.location}") }, var.tags, )
 }
 
-#--------------------------------------------
-# Subnets Creation - Depends on VNET Resource
-#--------------------------------------------
+#--------------------------------------------------------------------------------------------------------
+# Subnets Creation with, private link endpoint/servie network policies, service endpoints and Deligation.
+#--------------------------------------------------------------------------------------------------------
+
+resource "azurerm_subnet" "fw-snet" {
+  count                = var.firewall_subnet_address_prefix != null ? 1 : 0
+  name                 = "AzureFirewallSubnet"
+  resource_group_name  = local.resource_group_name
+  virtual_network_name = azurerm_virtual_network.vnet.name
+  address_prefixes     = var.firewall_subnet_address_prefix #[cidrsubnet(element(var.vnet_address_space, 0), 10, 0)]
+  service_endpoints    = var.firewall_service_endpoints
+}
+
+resource "azurerm_subnet" "gw_snet" {
+  count                = var.gateway_subnet_address_prefix != null ? 1 : 0
+  name                 = "GatewaySubnet"
+  resource_group_name  = local.resource_group_name
+  virtual_network_name = azurerm_virtual_network.vnet.name
+  address_prefixes     = var.gateway_subnet_address_prefix #[cidrsubnet(element(var.vnet_address_space, 0), 8, 1)]
+  service_endpoints    = ["Microsoft.Storage"]
+}
+
 resource "azurerm_subnet" "snet" {
   for_each                                       = var.subnets
   name                                           = each.value.subnet_name
