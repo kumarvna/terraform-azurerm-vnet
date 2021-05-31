@@ -23,16 +23,16 @@ module "vnet" {
   # By default, this module will not create a resource group, proivde the name here
   # to use an existing resource group, specify the existing resource group name,
   # and set the argument to `create_resource_group = true`. Location will be same as existing RG.
-  create_resource_group          = true
-  resource_group_name            = "rg-demo-westeurope-01"
-  vnetwork_name                  = "vnet-demo-westeurope-001"
+  resource_group_name            = "rg-shared-westeurope-02"
+  vnetwork_name                  = "vnet-shared-hub-westeurope-002"
   location                       = "westeurope"
   vnet_address_space             = ["10.1.0.0/16"]
   firewall_subnet_address_prefix = ["10.1.0.0/26"]
   gateway_subnet_address_prefix  = ["10.1.1.0/27"]
+  create_network_watcher         = false
 
   # Adding Standard DDoS Plan, and custom DNS servers (Optional)
-  create_ddos_plan = true
+  create_ddos_plan = false
 
   # Multiple Subnets, Service delegation, Service Endpoints, Network security groups
   # These are default subnets with required configuration, check README.md for more details
@@ -42,7 +42,7 @@ module "vnet" {
   # subnet name will be set as per Azure naming convention by defaut. expected value here is: <App or project name>
   subnets = {
     mgnt_subnet = {
-      subnet_name           = "management"
+      subnet_name           = "snet-management"
       subnet_address_prefix = ["10.1.2.0/24"]
       delegation = {
         name = "testdelegation"
@@ -51,6 +51,7 @@ module "vnet" {
           actions = ["Microsoft.Network/virtualNetworks/subnets/join/action", "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action"]
         }
       }
+
       nsg_inbound_rules = [
         # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix, destination_address_prefix]
         # To use defaults, use "" without adding any values.
@@ -67,7 +68,7 @@ module "vnet" {
     }
 
     dmz_subnet = {
-      subnet_name           = "appgateway"
+      subnet_name           = "snet-appgateway"
       subnet_address_prefix = ["10.1.3.0/24"]
       service_endpoints     = ["Microsoft.Storage"]
 
