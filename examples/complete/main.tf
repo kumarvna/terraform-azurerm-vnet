@@ -6,9 +6,8 @@ module "vnet" {
   # By default, this module will not create a resource group, proivde the name here
   # to use an existing resource group, specify the existing resource group name,
   # and set the argument to `create_resource_group = true`. Location will be same as existing RG.
-  create_resource_group          = true
-  resource_group_name            = "rg-shared-westeurope-01"
-  vnetwork_name                  = "vnet-shared-hub-westeurope-001"
+  resource_group_name            = "rg-shared-westeurope-02"
+  vnetwork_name                  = "vnet-shared-hub-westeurope-002"
   location                       = "westeurope"
   vnet_address_space             = ["10.1.0.0/16"]
   firewall_subnet_address_prefix = ["10.1.0.0/26"]
