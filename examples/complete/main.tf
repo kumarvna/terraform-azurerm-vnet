@@ -1,7 +1,7 @@
 module "vnet" {
   //source  = "kumarvna/vnet/azurerm"
   //version = "2.0.0"
-  source = "https://github.com/kumarvna/terraform-azurerm-vnet?ref=devlop"
+  source = "https://github.com/kumarvna/terraform-azurerm-vnet?ref=develop"
 
   # By default, this module will not create a resource group, proivde the name here
   # to use an existing resource group, specify the existing resource group name,
