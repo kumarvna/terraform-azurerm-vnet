@@ -12,7 +12,7 @@ steps:
 - task: AzureCLI@2
   displayName: "Creating Terraform Azure Backend Resources"
   inputs:
-    azureSubscription: 'Kumars_Free_Trail'
+    azureSubscription: 'TPC Azure Development 2(5a0855b9-426d-429e-83a9-ea7c4796e9a4)'
     scriptType: 'bash'
     scriptLocation: 'inlineScript'
     inlineScript: |
@@ -40,7 +40,7 @@ steps:
   inputs:
     command: 'init'
     backendType: 'azurerm'
-    backendServiceArm: 'Kumars_Free_Trail'
+    backendServiceArm: 'TPC Azure Development 2(5a0855b9-426d-429e-83a9-ea7c4796e9a4)'
     ensureBackend: true
     backendAzureRmResourceGroupName: 'rg-otk-terraform'
     backendAzureRmResourceGroupLocation: 'westeurope'
@@ -57,7 +57,7 @@ steps:
   displayName: "Terraform Plan"
   inputs:
     command: 'plan'
-    environmentServiceName: 'Kumars_Free_Trail'
+    environmentServiceName: 'TPC Azure Development 2(5a0855b9-426d-429e-83a9-ea7c4796e9a4)'
     commandOptions: '-out=plan.out'
     allowTelemetryCollection: false
     publishPlanResults: 'TerraformPlanOutput'
@@ -65,6 +65,6 @@ steps:
   displayName: "Apply Terraform Plan"
   inputs:
     command: 'apply'
-    environmentServiceName: 'Kumars_Free_Trail'
+    environmentServiceName: 'TPC Azure Development 2(5a0855b9-426d-429e-83a9-ea7c4796e9a4)'
     commandOptions: '-auto-approve plan.out'
     allowTelemetryCollection: false
