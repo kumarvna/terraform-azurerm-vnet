@@ -1,3 +1,8 @@
+# Azurerm provider configuration
+provider "azurerm" {
+  features {}
+}
+
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
   version = "2.1.0"
