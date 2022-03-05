@@ -316,8 +316,6 @@ An effective naming convention assembles resource names by using important resou
 | Name | Version |
 |------|---------|
 | azurerm | >= 2.59.0 |
-| random |>= 3.1.0 |
-| null | >= 3.1.0 |
 
 ## Inputs
 
