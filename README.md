@@ -16,9 +16,14 @@ Type of resources are supported:
 ## Module Usage
 
 ```hcl
+# Azurerm provider configuration
+provider "azurerm" {
+  features {}
+}
+
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
-  version = "2.1.0"
+  version = "2.2.0"
 
   # By default, this module will not create a resource group, proivde the name here
   # to use an existing resource group, specify the existing resource group name,
@@ -133,7 +138,7 @@ This module supports enabling the service endpoint of your choosing under the vi
 ```hcl
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
-  version = "2.1.0"
+  version = "2.2.0"
 
   # .... omitted
 
@@ -161,7 +166,7 @@ This module supports enabling the service delegation of your choosing under the 
 ```hcl
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
-  version = "2.1.0"
+  version = "2.2.0"
 
   # .... omitted
 
@@ -195,7 +200,7 @@ This module Enable or Disable network policies for the private link endpoint on 
 ```hcl
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
-  version = "2.1.0"
+  version = "2.2.0"
 
   # .... omitted
 
@@ -225,7 +230,7 @@ This module Enable or Disable network policies for the private link service on t
 ```hcl
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
-  version = "2.1.0"
+  version = "2.2.0"
 
   # .... omitted
 
@@ -261,7 +266,7 @@ In the Source and Destination columns, `VirtualNetwork`, `AzureLoadBalancer`, an
 ```hcl
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
-  version = "2.1.0"
+  version = "2.2.0"
 
   # .... omitted
 
@@ -323,7 +328,7 @@ End Date of the Project|Date when this application, workload, or service is plan
 ```hcl
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
-  version = "2.1.0"
+  version = "2.2.0"
 
   # ... omitted
 
