@@ -7,9 +7,14 @@ Configuration in this directory creates a set of Azure network resources. Few of
 Following example to create a simple virtual network with subnets and network watcher resources. Please see the complete example to add rest of the features in this module.
 
 ```hcl
+# Azurerm provider configuration
+provider "azurerm" {
+  features {}
+}
+
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
-  version = "2.1.0"
+  version = "2.2.0"
 
   # By default, this module will not create a resource group, proivde the name here
   # to use an existing resource group, specify the existing resource group name,
