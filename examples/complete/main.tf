@@ -5,7 +5,7 @@ provider "azurerm" {
 
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
-  version = "2.2.0"
+  version = "2.3.0"
 
   # By default, this module will not create a resource group, proivde the name here
   # to use an existing resource group, specify the existing resource group name,
@@ -31,6 +31,7 @@ module "vnet" {
     mgnt_subnet = {
       subnet_name           = "snet-management"
       subnet_address_prefix = ["10.1.2.0/24"]
+
       delegation = {
         name = "testdelegation"
         service_delegation = {
@@ -71,6 +72,12 @@ module "vnet" {
         # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix, destination_address_prefix]
         # To use defaults, use "" without adding any values.
       ]
+    }
+
+    pvt_subnet = {
+      subnet_name           = "snet-pvt"
+      subnet_address_prefix = ["10.1.4.0/24"]
+      service_endpoints     = ["Microsoft.Storage"]
     }
   }
 

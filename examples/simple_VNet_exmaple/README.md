@@ -14,7 +14,7 @@ provider "azurerm" {
 
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
-  version = "2.2.0"
+  version = "2.3.0"
 
   # By default, this module will not create a resource group, proivde the name here
   # to use an existing resource group, specify the existing resource group name,
@@ -85,6 +85,5 @@ Name | Description
 `subnet_ids` | List of IDs of subnets
 `subnet_address_prefixes` | List of address prefix for  subnets
 `network_security_group_ids`|List of Network security groups and ids
-`network_security_group`|Network security group details - Useful for splat expression.
 `ddos_protection_plan` | Azure Network DDoS protection plan
 `network_watcher_id` | ID of Network Watcher

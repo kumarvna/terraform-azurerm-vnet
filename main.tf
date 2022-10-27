@@ -90,18 +90,19 @@ resource "azurerm_subnet" "gw_snet" {
   resource_group_name  = local.resource_group_name
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = var.gateway_subnet_address_prefix #[cidrsubnet(element(var.vnet_address_space, 0), 8, 1)]
-  service_endpoints    = ["Microsoft.Storage"]
+  service_endpoints    = var.gateway_service_endpoints
 }
 
 resource "azurerm_subnet" "snet" {
-  for_each                                       = var.subnets
-  name                                           = each.value.subnet_name
-  resource_group_name                            = local.resource_group_name
-  virtual_network_name                           = azurerm_virtual_network.vnet.name
-  address_prefixes                               = each.value.subnet_address_prefix
-  service_endpoints                              = lookup(each.value, "service_endpoints", [])
-  enforce_private_link_endpoint_network_policies = lookup(each.value, "enforce_private_link_endpoint_network_policies", null)
-  enforce_private_link_service_network_policies  = lookup(each.value, "enforce_private_link_service_network_policies", null)
+  for_each                                      = var.subnets
+  name                                          = each.value.subnet_name
+  resource_group_name                           = local.resource_group_name
+  virtual_network_name                          = azurerm_virtual_network.vnet.name
+  address_prefixes                              = each.value.subnet_address_prefix
+  service_endpoints                             = lookup(each.value, "service_endpoints", [])
+  service_endpoint_policy_ids                   = lookup(each.value, "service_endpoint_policy_ids", null)
+  private_endpoint_network_policies_enabled     = lookup(each.value, "private_endpoint_network_policies_enabled", null)
+  private_link_service_network_policies_enabled = lookup(each.value, "private_link_service_network_policies_enabled", null)
 
   dynamic "delegation" {
     for_each = lookup(each.value, "delegation", {}) != {} ? [1] : []

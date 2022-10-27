@@ -28,14 +28,14 @@ variable "create_ddos_plan" {
   default     = false
 }
 
-variable "dns_servers" {
-  description = "List of dns servers to use for virtual network"
-  default     = []
-}
-
 variable "ddos_plan_name" {
   description = "The name of AzureNetwork DDoS Protection Plan"
   default     = "azureddosplan01"
+}
+
+variable "dns_servers" {
+  description = "List of dns servers to use for virtual network"
+  default     = []
 }
 
 variable "create_network_watcher" {
@@ -70,6 +70,12 @@ variable "firewall_service_endpoints" {
     "Microsoft.Sql",
     "Microsoft.Storage",
   ]
+}
+
+variable "gateway_service_endpoints" {
+  description = "Service endpoints to add to the Gateway subnet"
+  type        = list(string)
+  default     = []
 }
 
 variable "tags" {
