@@ -28,14 +28,14 @@ variable "create_ddos_plan" {
   default     = false
 }
 
-variable "dns_servers" {
-  description = "List of dns servers to use for virtual network"
-  default     = []
-}
-
 variable "ddos_plan_name" {
   description = "The name of AzureNetwork DDoS Protection Plan"
   default     = "azureddosplan01"
+}
+
+variable "dns_servers" {
+  description = "List of dns servers to use for virtual network"
+  default     = []
 }
 
 variable "create_network_watcher" {
