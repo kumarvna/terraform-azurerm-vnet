@@ -145,7 +145,7 @@ This module supports enabling the service endpoint of your choosing under the vi
 ```hcl
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
-  version = "2.2.0"
+  version = "2.3.0"
 
   # .... omitted
 
@@ -173,7 +173,7 @@ This module supports enabling the service delegation of your choosing under the 
 ```hcl
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
-  version = "2.2.0"
+  version = "2.3.0"
 
   # .... omitted
 
@@ -207,7 +207,7 @@ This module Enable or Disable network policies for the private link endpoint on 
 ```hcl
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
-  version = "2.2.0"
+  version = "2.3.0"
 
   # .... omitted
 
@@ -237,7 +237,7 @@ This module Enable or Disable network policies for the private link service on t
 ```hcl
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
-  version = "2.2.0"
+  version = "2.3.0"
 
   # .... omitted
 
@@ -273,7 +273,7 @@ In the Source and Destination columns, `VirtualNetwork`, `AzureLoadBalancer`, an
 ```hcl
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
-  version = "2.2.0"
+  version = "2.3.0"
 
   # .... omitted
 
