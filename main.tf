@@ -90,7 +90,7 @@ resource "azurerm_subnet" "gw_snet" {
   resource_group_name  = local.resource_group_name
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = var.gateway_subnet_address_prefix #[cidrsubnet(element(var.vnet_address_space, 0), 8, 1)]
-  service_endpoints    = ["Microsoft.Storage"]
+  service_endpoints    = var.gateway_service_endpoints
 }
 
 resource "azurerm_subnet" "snet" {

@@ -72,6 +72,12 @@ variable "firewall_service_endpoints" {
   ]
 }
 
+variable "gateway_service_endpoints" {
+  description = "Service endpoints to add to the Gateway subnet"
+  type        = list(string)
+  default     = []
+}
+
 variable "tags" {
   description = "A map of tags to add to all resources"
   type        = map(string)
