@@ -5,7 +5,7 @@ provider "azurerm" {
 
 module "vnet" {
   source  = "kumarvna/vnet/azurerm"
-  version = "2.2.0"
+  version = "2.3.0"
 
   # By default, this module will not create a resource group, proivde the name here
   # to use an existing resource group, specify the existing resource group name,
