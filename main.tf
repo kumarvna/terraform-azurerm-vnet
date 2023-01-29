@@ -64,7 +64,7 @@ resource "azurerm_resource_group" "nwatcher" {
 }
 
 resource "azurerm_network_watcher" "nwatcher" {
-  count               = var.create_network_watcher != false ? 1 : 0
+  count               = var.create_network_watcher ? 1 : 0
   name                = "NetworkWatcher_${local.location}"
   location            = local.location
   resource_group_name = azurerm_resource_group.nwatcher.0.name
